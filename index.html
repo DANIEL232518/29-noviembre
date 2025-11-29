@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compilador LaTeX en Español - Online</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github-dark.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🖋️ Compilador LaTeX en Español</h1>
+            <p>Escribe código .texes y obtén LaTeX al instante - 100% en tu navegador</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Editor -->
+            <div class="editor-panel">
+                <div class="panel-header">
+                    <h2>📝 Escribe tu código .texes</h2>
+                    <div class="controls">
+                        <select id="loadExample" class="control-select">
+                            <option value="">Cargar ejemplo...</option>
+                            <option value="documento">Documento básico</option>
+                            <option value="matematicas">Fórmulas matemáticas</option>
+                            <option value="listas">Listas y elementos</option>
+                            <option value="formato">Formatos de texto</option>
+                            <option value="academico">Documento académico</option>
+                        </select>
+                        <button id="clearBtn" class="btn btn-secondary">Limpiar</button>
+                        <button id="compileBtn" class="btn btn-primary">Compilar ▶️</button>
+                    </div>
+                </div>
+                <textarea id="inputCode" placeholder="documento_inicio();&#10;titulo(&quot;Mi Documento&quot;);&#10;autor(&quot;Tu Nombre&quot;);&#10;seccion(&quot;Introducción&quot;);&#10;parrafo(&quot;Hola mundo!&quot;);&#10;documento_fin();"></textarea>
+            </div>
+
+            <!-- Resultado -->
+            <div class="result-panel">
+                <div class="panel-header">
+                    <h2>📄 Resultado LaTeX</h2>
+                    <div class="controls">
+                        <button id="copyBtn" class="btn btn-secondary">📋 Copiar</button>
+                        <button id="downloadBtn" class="btn btn-success">💾 Descargar .tex</button>
+                    </div>
+                </div>
+                <div id="outputCode" class="output-container">
+                    <pre><code class="language-latex">// El código LaTeX generado aparecerá aquí</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de ayuda -->
+        <div class="help-panel">
+            <div class="help-tabs">
+                <button class="tab-btn active" onclick="showTab('sintaxis')">📚 Sintaxis</button>
+                <button class="tab-btn" onclick="showTab('comandos')">⚙️ Comandos</button>
+                <button class="tab-btn" onclick="showTab('ejemplos')">🎯 Ejemplos</button>
+            </div>
+
+            <div class="tab-content">
+                <!-- Sintaxis -->
+                <div id="sintaxis" class="tab-pane active">
+                    <h3>Sintaxis Básica</h3>
+                    <div class="syntax-item">
+                        <h4>📄 Estructura del documento</h4>
+                        <pre><code>documento_inicio();
+titulo("Mi Documento");
+autor("Tu Nombre");
+fecha("2024");
+
+seccion("Introducción");
+parrafo("Texto del párrafo...");
+
+documento_fin();</code></pre>
+                    </div>
+                    
+                    <div class="syntax-item">
+                        <h4>🎨 Formato de texto</h4>
+                        <pre><code>negrita("Texto importante");
+cursiva("Texto con énfasis");
+subrayado("Texto resaltado");
+tachado("Texto eliminado");</code></pre>
+                    </div>
+                </div>
+
+                <!-- Comandos -->
+                <div id="comandos" class="tab-pane">
+                    <h3>Comandos Disponibles</h3>
+                    <div class="commands-grid">
+                        <div class="command-group">
+                            <h4>📋 Estructura</h4>
+                            <ul>
+                                <li><code>documento_inicio()</code></li>
+                                <li><code>documento_fin()</code></li>
+                                <li><code>seccion("título")</code></li>
+                                <li><code>subseccion("título")</code></li>
+                                <li><code>subsubseccion("título")</code></li>
+                                <li><code>capitulo("título")</code></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="command-group">
+                            <h4>📝 Texto</h4>
+                            <ul>
+                                <li><code>parrafo("texto")</code></li>
+                                <li><code>negrita("texto")</code></li>
+                                <li><code>cursiva("texto")</code></li>
+                                <li><code>subrayado("texto")</code></li>
+                                <li><code>tachado("texto")</code></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="command-group">
+                            <h4>📊 Listas</h4>
+                            <ul>
+                                <li><code>lista_simple()</code></li>
+                                <li><code>lista_numerada()</code></li>
+                                <li><code>elemento("texto")</code></li>
+                                <li><code>fin_lista()</code></li>
+                            </ul>
+                        </div>
+                        
+                        <div class="command-group">
+                            <h4>🧮 Matemáticas</h4>
+                            <ul>
+                                <li><code>ecuacion("fórmula")</code></li>
+                                <li><code>formula("fórmula")</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ejemplos -->
+                <div id="ejemplos" class="tab-pane">
+                    <h3>Ejemplos Listos para Usar</h3>
+                    
+                    <div class="example-item">
+                        <h4>📄 Documento Académico</h4>
+                        <pre><code>documento_inicio();
+
+titulo("Estudio sobre Inteligencia Artificial");
+autor("Dr. María González");
+fecha("2024");
+
+resumen("Este estudio explora los avances recientes en IA...");
+
+seccion("Introducción");
+parrafo("La inteligencia artificial ha revolucionado...");
+
+subseccion("Objetivos");
+lista_numerada();
+elemento("Analizar el estado del arte en IA");
+elemento("Identificar tendencias futuras");
+elemento("Proponer aplicaciones prácticas");
+fin_lista();
+
+seccion("Metodología");
+parrafo("Se utilizó una metodología basada en...");
+
+subseccion("Resultados");
+ecuacion("P = \\\\frac{1}{1 + e^{-(\\\\beta_0 + \\\\beta_1 x)}}");
+parrafo("Los resultados muestran que...");
+
+seccion("Conclusiones");
+parrafo("En conclusión, la IA presenta oportunidades...");
+
+documento_fin();</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado -->
+        <div class="status-bar">
+            <span id="statusText">✅ Listo para compilar</span>
+            <div class="progress">
+                <div id="progressBar" class="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="compiler.js"></script>
+    <script>
+        // Navegación de pestañas
+        function showTab(tabName) {
+            // Ocultar todos los paneles
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+            
+            // Remover activo de todos los botones
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar panel seleccionado
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Inicializar highlight.js
+        hljs.highlightAll();
+    </script>
+</body>
+</html>
