@@ -95,9 +95,7 @@ subrayado("Este texto está subrayado.");
 tachado("Este texto está tachado.");
 
 seccion("Combinaciones");
-parrafo("Texto normal con " + 
-       "negrita(parte en negrita) " + 
-       "y cursiva(parte en cursiva) mezclados.");
+parrafo("Texto normal con parte en negrita y parte en cursiva mezclados.");
 
 seccion("Alineación");
 centrar("Este texto está centrado.");
@@ -202,9 +200,6 @@ documento_fin();`
                 this.compile();
             }
         });
-
-        // Auto-compilar al cambiar texto (opcional)
-        // document.getElementById('inputCode').addEventListener('input', () => this.compile());
     }
 
     loadExample(exampleName) {
@@ -232,126 +227,226 @@ documento_fin();`
         this.updateProgress(30);
 
         try {
-            // Simular procesamiento (pequeña demora para feedback visual)
+            // Validación inicial
+            if (!input.includes('documento_inicio()')) {
+                throw new Error('El documento debe comenzar con documento_inicio()');
+            }
+
+            if (!input.includes('documento_fin()')) {
+                throw new Error('El documento debe terminar con documento_fin()');
+            }
+
             setTimeout(() => {
-                const latexCode = this.processTexes(input);
-                this.displayResult(latexCode);
-                this.updateProgress(100);
-                this.updateStatus('✅ Compilación exitosa', 'success');
+                try {
+                    const latexCode = this.processTexes(input);
+                    this.displayResult(latexCode);
+                    this.updateProgress(100);
+                    this.updateStatus('✅ Compilación exitosa', 'success');
+                } catch (error) {
+                    this.updateStatus(`❌ Error de sintaxis: ${error.message}`, 'error');
+                    this.updateProgress(0);
+                }
             }, 500);
 
         } catch (error) {
-            this.updateStatus('❌ Error: ' + error.message, 'error');
+            this.updateStatus(`❌ Error: ${error.message}`, 'error');
             this.updateProgress(0);
         }
     }
 
-  processTexes(texesCode) {
-    let lines = texesCode.split('\n');
-    let latex = '';
-    let inList = false;
-    let listType = '';
-    let metadata = {
-        titulo: 'Documento Generado',
-        autor: 'Compilador LaTeX Web',
-        fecha: '\\today',
-        resumen: ''
-    };
+    processTexes(texesCode) {
+        let lines = texesCode.split('\n');
+        let latex = '';
+        let inList = false;
+        let listType = '';
+        let metadata = {
+            titulo: 'Documento Generado',
+            autor: 'Compilador LaTeX Web',
+            fecha: '\\today',
+            resumen: ''
+        };
 
-    // Validar estructura básica
-    if (!texesCode.includes('documento_inicio()') || !texesCode.includes('documento_fin()')) {
-        throw new Error('El documento debe comenzar con documento_inicio() y terminar con documento_fin()');
-    }
+        // Procesar cada línea
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim();
+            let lineNumber = i + 1;
+            
+            // Saltar líneas vacías y comentarios
+            if (!line || line.startsWith('//')) continue;
 
-    // Procesar cada línea con validación
-    for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim();
-        let lineNumber = i + 1;
-        
-        // Saltar líneas vacías y comentarios
-        if (!line || line.startsWith('//')) continue;
-
-        // Validar que las líneas de comando terminen con ;
-        if (this.isCommandLine(line) && !line.endsWith(';')) {
-            throw new Error(`Error en línea ${lineNumber}: Falta punto y coma (;) al final del comando`);
-        }
-
-        // Validar paréntesis balanceados
-        if ((line.includes('(') || line.includes(')')) && !this.hasBalancedParentheses(line)) {
-            throw new Error(`Error en línea ${lineNumber}: Paréntesis no balanceados`);
-        }
-
-        // Resto del procesamiento...
-        // [El código existente continúa aquí]
-    }
-
-    return latex;
-}
-
-// Nuevas funciones de validación
-isCommandLine(line) {
-    const commands = [
-        'documento_inicio', 'documento_fin', 'titulo', 'autor', 'fecha', 'resumen',
-        'seccion', 'subseccion', 'subsubseccion', 'capitulo', 'parrafo',
-        'negrita', 'cursiva', 'subrayado', 'tachado', 'centrar', 'derecha', 
-        'izquierda', 'justificar', 'lista_simple', 'lista_numerada', 'elemento',
-        'fin_lista', 'ecuacion', 'formula', 'salto_linea', 'salto_pagina', 'nueva_pagina'
-    ];
-
-    return commands.some(cmd => line.trim().startsWith(cmd + '(') || 
-                               line.trim().startsWith(cmd + ' '));
-}
-
-hasBalancedParentheses(line) {
-    let balance = 0;
-    for (let char of line) {
-        if (char === '(') balance++;
-        if (char === ')') balance--;
-        if (balance < 0) return false;
-    }
-    return balance === 0;
-}
-
-// En la función compile, mejorar el manejo de errores
-compile() {
-    const input = document.getElementById('inputCode').value.trim();
-    
-    if (!input) {
-        this.updateStatus('⚠️ Escribe algún código .texes primero', 'warning');
-        return;
-    }
-
-    this.updateStatus('🔄 Compilando...', 'loading');
-    this.updateProgress(30);
-
-    try {
-        // Validación inicial
-        if (!input.includes('documento_inicio()')) {
-            throw new Error('El documento debe comenzar con documento_inicio()');
-        }
-
-        if (!input.includes('documento_fin()')) {
-            throw new Error('El documento debe terminar con documento_fin()');
-        }
-
-        setTimeout(() => {
-            try {
-                const latexCode = this.processTexes(input);
-                this.displayResult(latexCode);
-                this.updateProgress(100);
-                this.updateStatus('✅ Compilación exitosa', 'success');
-            } catch (error) {
-                this.updateStatus(`❌ Error de sintaxis: ${error.message}`, 'error');
-                this.updateProgress(0);
+            // Validar que las líneas de comando terminen con ;
+            if (this.isCommandLine(line) && !line.endsWith(';')) {
+                throw new Error(`Error en línea ${lineNumber}: Falta punto y coma (;) al final del comando`);
             }
-        }, 500);
 
-    } catch (error) {
-        this.updateStatus(`❌ Error: ${error.message}`, 'error');
-        this.updateProgress(0);
+            // Validar paréntesis balanceados
+            if ((line.includes('(') || line.includes(')')) && !this.hasBalancedParentheses(line)) {
+                throw new Error(`Error en línea ${lineNumber}: Paréntesis no balanceados`);
+            }
+
+            // Procesar comandos
+            if (line.includes('documento_inicio()')) {
+                latex = this.generatePreamble(metadata);
+            }
+            else if (line.includes('documento_fin()')) {
+                if (inList) {
+                    latex += this.endList(listType);
+                    inList = false;
+                }
+                latex += '\\end{document}';
+            }
+            else if (line.includes('titulo(')) {
+                metadata.titulo = this.extractArgument(line);
+                latex = this.generatePreamble(metadata); // Regenerar preámbulo
+            }
+            else if (line.includes('autor(')) {
+                metadata.autor = this.extractArgument(line);
+                latex = this.generatePreamble(metadata);
+            }
+            else if (line.includes('fecha(')) {
+                metadata.fecha = this.extractArgument(line);
+                latex = this.generatePreamble(metadata);
+            }
+            else if (line.includes('resumen(')) {
+                metadata.resumen = this.extractArgument(line);
+            }
+            else if (line.includes('seccion(')) {
+                if (inList) {
+                    latex += this.endList(listType);
+                    inList = false;
+                }
+                latex += `\\section{${this.extractArgument(line)}}\n\n`;
+            }
+            else if (line.includes('subseccion(')) {
+                if (inList) {
+                    latex += this.endList(listType);
+                    inList = false;
+                }
+                latex += `\\subsection{${this.extractArgument(line)}}\n\n`;
+            }
+            else if (line.includes('subsubseccion(')) {
+                if (inList) {
+                    latex += this.endList(listType);
+                    inList = false;
+                }
+                latex += `\\subsubsection{${this.extractArgument(line)}}\n\n`;
+            }
+            else if (line.includes('capitulo(')) {
+                if (inList) {
+                    latex += this.endList(listType);
+                    inList = false;
+                }
+                latex += `\\chapter{${this.extractArgument(line)}}\n\n`;
+            }
+            else if (line.includes('parrafo(')) {
+                if (inList) {
+                    latex += this.endList(listType);
+                    inList = false;
+                }
+                latex += `${this.extractArgument(line)}\n\n`;
+            }
+            else if (line.includes('negrita(')) {
+                const text = this.extractArgument(line);
+                latex += `\\textbf{${text}}\n\n`;
+            }
+            else if (line.includes('cursiva(')) {
+                const text = this.extractArgument(line);
+                latex += `\\textit{${text}}\n\n`;
+            }
+            else if (line.includes('subrayado(')) {
+                const text = this.extractArgument(line);
+                latex += `\\underline{${text}}\n\n`;
+            }
+            else if (line.includes('tachado(')) {
+                const text = this.extractArgument(line);
+                latex += `\\sout{${text}}\n\n`;
+            }
+            else if (line.includes('centrar(')) {
+                const text = this.extractArgument(line);
+                latex += `\\begin{center}\n${text}\n\\end{center}\n\n`;
+            }
+            else if (line.includes('derecha(')) {
+                const text = this.extractArgument(line);
+                latex += `\\begin{flushright}\n${text}\n\\end{flushright}\n\n`;
+            }
+            else if (line.includes('izquierda(')) {
+                const text = this.extractArgument(line);
+                latex += `\\begin{flushleft}\n${text}\n\\end{flushleft}\n\n`;
+            }
+            else if (line.includes('justificar(')) {
+                const text = this.extractArgument(line);
+                latex += text + '\n\n';
+            }
+            else if (line.includes('lista_simple()')) {
+                if (inList) {
+                    latex += this.endList(listType);
+                }
+                latex += '\\begin{itemize}\n';
+                inList = true;
+                listType = 'itemize';
+            }
+            else if (line.includes('lista_numerada()')) {
+                if (inList) {
+                    latex += this.endList(listType);
+                }
+                latex += '\\begin{enumerate}\n';
+                inList = true;
+                listType = 'enumerate';
+            }
+            else if (line.includes('elemento(')) {
+                if (inList) {
+                    latex += `  \\item ${this.extractArgument(line)}\n`;
+                }
+            }
+            else if (line.includes('fin_lista()')) {
+                if (inList) {
+                    latex += this.endList(listType);
+                    inList = false;
+                }
+            }
+            else if (line.includes('ecuacion(')) {
+                if (inList) {
+                    latex += this.endList(listType);
+                    inList = false;
+                }
+                const formula = this.extractArgument(line);
+                latex += `\\begin{equation}\n${formula}\n\\end{equation}\n\n`;
+            }
+            else if (line.includes('formula(')) {
+                const formula = this.extractArgument(line);
+                latex += `$${formula}$\n\n`;
+            }
+        }
+
+        // Cerrar lista si todavía está abierta
+        if (inList) {
+            latex += this.endList(listType);
+        }
+
+        return latex;
     }
-}
 
+    isCommandLine(line) {
+        const commands = [
+            'documento_inicio', 'documento_fin', 'titulo', 'autor', 'fecha', 'resumen',
+            'seccion', 'subseccion', 'subsubseccion', 'capitulo', 'parrafo',
+            'negrita', 'cursiva', 'subrayado', 'tachado', 'centrar', 'derecha', 
+            'izquierda', 'justificar', 'lista_simple', 'lista_numerada', 'elemento',
+            'fin_lista', 'ecuacion', 'formula', 'salto_linea', 'salto_pagina', 'nueva_pagina'
+        ];
+
+        return commands.some(cmd => line.trim().startsWith(cmd + '('));
+    }
+
+    hasBalancedParentheses(line) {
+        let balance = 0;
+        for (let char of line) {
+            if (char === '(') balance++;
+            if (char === ')') balance--;
+            if (balance < 0) return false;
+        }
+        return balance === 0;
+    }
 
     extractArgument(line) {
         const match = line.match(/\((.*)\)/);
@@ -404,6 +499,9 @@ ${metadata.resumen}
     displayResult(latexCode) {
         const outputElement = document.getElementById('outputCode');
         
+        // Limpiar el contenido anterior
+        outputElement.innerHTML = '';
+        
         // Crear elemento pre con código resaltado
         const pre = document.createElement('pre');
         const code = document.createElement('code');
@@ -411,13 +509,14 @@ ${metadata.resumen}
         code.textContent = latexCode;
         pre.appendChild(code);
         
-        outputElement.innerHTML = '';
         outputElement.appendChild(pre);
         
         // Resaltar sintaxis
         if (window.hljs) {
             hljs.highlightElement(code);
         }
+        
+        console.log('Código LaTeX generado y mostrado:', latexCode);
     }
 
     async copyResult() {
